@@ -5,6 +5,9 @@ Survey Question 1
 {% endblock %}
 
 {% block content %}
+{% for msg in get_flashed_messages() %}
+<p>{{msg}}</p>
+{% endfor %}
 <p>{{question}}</p>
 <form action="/answer" method="POST">
     <label for="answer">Answer: </label><input type="text" name="answer">

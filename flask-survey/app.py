@@ -1,6 +1,6 @@
 from crypt import methods
 from http.client import responses
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, flash
 from flask_debugtoolbar import DebugToolbarExtension
 from surveys import satisfaction_survey
 
@@ -16,15 +16,30 @@ def show_home_page():
     return render_template('home.html')
 
 
-@app.route(f'/questions/{question_num}')
-def get_question_page():
-    question = satisfaction_survey.questions[question_num].question
-    return render_template('question.html', question=question)
+@app.route('/questions/<num>')
+def get_question_page(num):
+    global question_num
+    q_num = int(num)
+    if len(responses) == len(satisfaction_survey.questions):
+        flash("You have already completed the survey, doofus!")
+        return redirect('/thankyou')
+    if q_num == question_num:
+        question = satisfaction_survey.questions[q_num].question
+        return render_template('question.html', question=question)
+    flash("You need to answer the questions in order, u absolute knob!")
+    return redirect(f"/questions/{question_num}")
 
+
+@app.route('/thankyou')
+def show_thankyou():
+    return render_template('thankyou.html')
 
 @app.route("/answer", methods=["POST"])
 def process_answer():
-    newNum = question_num + 1
     answer = request.form["answer"]
     responses.append(answer)
-    return redirect(f'/questions/{newNum}')
+    global question_num
+    question_num += 1
+    if question_num >= len(satisfaction_survey.questions):
+        return redirect("/thankyou")
+    return redirect(f"/questions/{question_num}")
