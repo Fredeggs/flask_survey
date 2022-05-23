@@ -9,4 +9,5 @@ Thank You!
 <p>{{msg}}</p>
 {% endfor %}
 <p>Thank you for completing the survey. We value your answers very much ;)</p>
+<p>These were your responses: {{session.get('responses', 'uh oh, you may have hacked the matrix')}}</p>
 {% endblock %}
